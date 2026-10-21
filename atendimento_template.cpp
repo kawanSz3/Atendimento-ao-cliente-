@@ -12,6 +12,7 @@ struct No {
 
 No* inicioFila = nullptr;
 No* fimFila = nullptr;
+No* topoHistorico = nullptr;
 
 // Adiciona um paciente no final da fila.
 void enqueue(const string& nome, int urgencia) {
@@ -66,6 +67,35 @@ int tamanho() {
         atual = atual->prox;
     }
     return quantidade;
+}
+
+// Registra um atendimento no topo da pilha.
+void push(const string& nome) {
+    No* novo = new No{nome, 0, topoHistorico};
+    topoHistorico = novo;
+}
+
+// Remove e devolve o atendimento mais recente.
+No* pop() {
+    if (topoHistorico == nullptr) {
+        cout << "O historico de atendimentos esta vazio.\n";
+        return nullptr;
+    }
+
+    No* removido = topoHistorico;
+    topoHistorico = topoHistorico->prox;
+    removido->prox = nullptr;
+    return removido;
+}
+
+// Mostra o atendimento mais recente sem removê-lo.
+void peek() {
+    if (topoHistorico == nullptr) {
+        cout << "O historico de atendimentos esta vazio.\n";
+        return;
+    }
+
+    cout << "Atendimento mais recente: " << topoHistorico->nome << '\n';
 }
 
 int main() {
