@@ -143,14 +143,68 @@ void percorrer() {
     }
 }
 
+// Mostra todos os pacientes que ainda aguardam atendimento.
+void mostrarFila() {
+    if (inicioFila == nullptr) {
+        cout << "A fila de pacientes esta vazia.\n";
+        return;
+    }
+
+    cout << "Pacientes aguardando:\n";
+    No* atual = inicioFila;
+    while (atual != nullptr) {
+        cout << "- " << atual->nome << " (urgencia ";
+        if (atual->urgencia == 1) {
+            cout << "baixa";
+        } else if (atual->urgencia == 2) {
+            cout << "media";
+        } else {
+            cout << "alta";
+        }
+        cout << ")\n";
+        atual = atual->prox;
+    }
+    cout << "Total: " << tamanho() << '\n';
+}
+
+// Imprime do atendimento mais recente ao mais antigo e restaura a pilha.
+void imprimirHistorico() {
+    if (topoHistorico == nullptr) {
+        cout << "O historico de atendimentos esta vazio.\n";
+        return;
+    }
+
+    No* auxiliar = nullptr;
+    cout << "Historico (do mais recente ao mais antigo):\n";
+    while (topoHistorico != nullptr) {
+        No* atendimento = topoHistorico;
+        topoHistorico = topoHistorico->prox;
+        cout << "- " << atendimento->nome << '\n';
+        atendimento->prox = auxiliar;
+        auxiliar = atendimento;
+    }
+
+    while (auxiliar != nullptr) {
+        No* atendimento = auxiliar;
+        auxiliar = auxiliar->prox;
+        atendimento->prox = topoHistorico;
+        topoHistorico = atendimento;
+    }
+}
+
 int main() {
     int opcao = 0;
-    while (opcao != 4) {
-        cout << "\n=== Fila de pacientes ===\n"
+    while (opcao != 9) {
+        cout << "\n=== Triagem Digital do Hospital Campo Real ===\n"
              << "1. Cadastrar paciente\n"
-             << "2. Chamar primeiro paciente\n"
-             << "3. Mostrar primeiro e tamanho da fila\n"
-             << "4. Sair\n"
+             << "2. Cadastrar medico\n"
+             << "3. Mostrar pacientes aguardando\n"
+             << "4. Realizar atendimento\n"
+             << "5. Mostrar medicos disponiveis\n"
+             << "6. Imprimir historico\n"
+             << "7. Ver atendimento mais recente\n"
+             << "8. Remover atendimento mais recente\n"
+             << "9. Sair\n"
              << "Opcao: ";
         if (!(cin >> opcao)) {
             break;
@@ -169,15 +223,47 @@ int main() {
                 break;
             }
         } else if (opcao == 2) {
+            string nome;
+            cout << "Nome do medico: ";
+            cin >> ws;
+            getline(cin, nome);
+            adicionarMedico(nome);
+            cout << "Medico cadastrado.\n";
+        } else if (opcao == 3) {
+            mostrarFila();
+        } else if (opcao == 4) {
+            if (inicioFila == nullptr) {
+                cout << "A fila de pacientes esta vazia.\n";
+                continue;
+            }
+
+            No* medico = chamarMedico();
+            if (medico == nullptr) {
+                continue;
+            }
+
             No* paciente = dequeue();
             if (paciente != nullptr) {
-                cout << "Paciente chamado: " << paciente->nome << '\n';
+                cout << "Atendimento realizado: " << paciente->nome
+                     << " atendido(a) pelo(a) Dr(a). " << medico->nome << ".\n";
+                push(paciente->nome);
+                adicionarMedico(medico->nome);
                 delete paciente;
             }
-        } else if (opcao == 3) {
-            frente_peak();
-            cout << "Pacientes aguardando: " << tamanho() << '\n';
-        } else if (opcao != 4) {
+            delete medico;
+        } else if (opcao == 5) {
+            percorrer();
+        } else if (opcao == 6) {
+            imprimirHistorico();
+        } else if (opcao == 7) {
+            peek();
+        } else if (opcao == 8) {
+            No* atendimento = pop();
+            if (atendimento != nullptr) {
+                cout << "Atendimento removido: " << atendimento->nome << '\n';
+                delete atendimento;
+            }
+        } else {
             cout << "Opcao invalida.\n";
         }
     }
@@ -188,5 +274,18 @@ int main() {
         delete removido;
     }
     fimFila = nullptr;
+
+    while (topoHistorico != nullptr) {
+        No* removido = topoHistorico;
+        topoHistorico = topoHistorico->prox;
+        delete removido;
+    }
+
+    while (inicioMedicos != nullptr) {
+        No* removido = inicioMedicos;
+        inicioMedicos = inicioMedicos->prox;
+        delete removido;
+    }
+    fimMedicos = nullptr;
     return 0;
 }
