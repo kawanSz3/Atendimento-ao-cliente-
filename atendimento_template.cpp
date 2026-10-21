@@ -13,6 +13,8 @@ struct No {
 No* inicioFila = nullptr;
 No* fimFila = nullptr;
 No* topoHistorico = nullptr;
+No* inicioMedicos = nullptr;
+No* fimMedicos = nullptr;
 
 // Adiciona um paciente no final da fila.
 void enqueue(const string& nome, int urgencia) {
@@ -96,6 +98,49 @@ void peek() {
     }
 
     cout << "Atendimento mais recente: " << topoHistorico->nome << '\n';
+}
+
+// Adiciona um médico ao final da lista de disponíveis.
+void adicionarMedico(const string& nome) {
+    No* novo = new No{nome, 0, nullptr};
+    if (fimMedicos == nullptr) {
+        inicioMedicos = novo;
+        fimMedicos = novo;
+    } else {
+        fimMedicos->prox = novo;
+        fimMedicos = novo;
+    }
+}
+
+// Retira e devolve o primeiro médico disponível.
+No* chamarMedico() {
+    if (inicioMedicos == nullptr) {
+        cout << "Nao ha medicos disponiveis.\n";
+        return nullptr;
+    }
+
+    No* chamado = inicioMedicos;
+    inicioMedicos = inicioMedicos->prox;
+    if (inicioMedicos == nullptr) {
+        fimMedicos = nullptr;
+    }
+    chamado->prox = nullptr;
+    return chamado;
+}
+
+// Lista todos os médicos disponíveis.
+void percorrer() {
+    if (inicioMedicos == nullptr) {
+        cout << "Nao ha medicos disponiveis.\n";
+        return;
+    }
+
+    cout << "Medicos disponiveis:\n";
+    No* atual = inicioMedicos;
+    while (atual != nullptr) {
+        cout << "- " << atual->nome << '\n';
+        atual = atual->prox;
+    }
 }
 
 int main() {
