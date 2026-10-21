@@ -263,7 +263,7 @@ int main() {
                 cout << "Atendimento removido: " << atendimento->nome << '\n';
                 delete atendimento;
             }
-        } else {
+        } else if (opcao != 9) {
             cout << "Opcao invalida.\n";
         }
     }
